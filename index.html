@@ -1133,11 +1133,11 @@
             let statusText = 'DENSITY NORMAL';
             let color = 'var(--accent-green)';
 
-            if (density < 0.250) {
+            if (density < 0.200) {
                 statusClass = 'status-danger';
                 statusText = 'DENSITY TOO LOW';
                 color = 'var(--accent-red)';
-            } else if (density > 0.270) {
+            } else if (density > 0.240) {
                 statusClass = 'status-danger';
                 statusText = 'DENSITY TOO HIGH';
                 color = 'var(--accent-red)';
