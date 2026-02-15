@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starium Rafa Quality Control Tool</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --text-main: #E0E0E0;
+            --accent-blue: #00BCD4; /* Safety Cyan */
+            --accent-green: #00E676; /* Bright Green */
+            --accent-red: #FF1744;   /* Bright Red */
+            --accent-yellow: #FFEA00;
+            --input-bg: #2C2C2C;
+            --shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- Header Styling --- */
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            width: 100%;
+            max-width: 800px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            font-weight: 300;
+            margin-top: 0;
+            opacity: 0.9;
+            transition: all 0.5s ease;
+        }
+
+        /* --- Controls Section --- */
+        .controls {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out 0.3s backwards;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #aaa;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            background-color: var(--input-bg);
+            border: 2px solid #444;
+            color: white;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* --- Results Area --- */
+        #results-area {
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+            margin-bottom: 4rem;
+        }
+
+        /* Grid for Machines */
+        .machines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .machine-btn {
+            background: linear-gradient(145deg, #2a2a2a, #333);
+            border: none;
+            color: white;
+            padding: 1.5rem 0.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 5px 5px 10px #151515, -5px -5px 10px #3d3d3d;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .machine-btn:hover {
+            transform: translateY(-5px);
+            background: var(--accent-blue);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(0, 188, 212, 0.4);
+        }
+
+        .machine-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* BOT Density Display */
+        .bot-display {
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 3px solid transparent;
+        }
+
+        .bot-value {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .bot-label {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+        }
+
+        .status-msg {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        /* Status Colors & Animations */
+        .status-ok {
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.2);
+        }
+
+        .status-danger {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+            animation: pulseRed 1.5s infinite;
+        }
+
+        /* --- Modal (Popup) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 40px rgba(0, 188, 212, 0.2);
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+        }
+
+        .modal-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-label { color: #888; }
+        .modal-value { color: white; font-weight: bold; }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: default;
+            position: relative;
+            height: 30px; /* Fix height to prevent jump */
+        }
+
+        .footer-content {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        .footer-contact {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        footer:hover .footer-copyright {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        footer:hover .footer-contact {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- Animations --- */
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulseRed {
+            0% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 23, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Starium Rafa Quality Control Tool</h1>
+        <h2 id="subtitle">Level 9 Silo Densities</h2>
+    </header>
+
+    <div class="controls">
+        <div class="input-group">
+            <label for="mode-select">Select Mode</label>
+            <select id="mode-select">
+                <option value="level9">Level 9 Silo Densities</option>
+                <option value="bot">BOT Densities</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="weight-input">Powder Weight (g)</label>
+            <input type="number" id="weight-input" placeholder="Enter weight..." autocomplete="off">
+        </div>
+    </div>
+
+    <div id="results-area">
+        <!-- Content will be injected here via JavaScript -->
+        <div style="color: #555; font-style: italic;">Enter a weight to see results...</div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-title" id="m-title">Machine 01</div>
+            <div class="modal-info">
+                <span class="modal-label">Line:</span>
+                <span class="modal-value" id="m-line">1A</span>
+            </div>
+            <div class="modal-info">
+                <span class="modal-label">Configuration:</span>
+                <span class="modal-value" id="m-gram">125g</span>
+            </div>
+            <div class="modal-info">
+                <span class="modal-label">Allowed Range:</span>
+                <span class="modal-value" id="m-range">0.200 - 0.270</span>
+            </div>
+            <div style="margin-top: 2rem; font-size: 0.8rem; color: #666;">
+                Click outside to close
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content footer-copyright">
+            &copy; <span id="year">2026</span> Dammie Optimus Solutions. All rights reserved.
+        </div>
+        <div class="footer-content footer-contact">
+            WhatsApp Dammie Optimus Solutions on 07053331253
+        </div>
+    </footer>
+
+    <script>
+        /* 
+         * =========================================
+         * DATA CONSTANTS
+         * =========================================
+         */
+        
+        // Machine Configuration Data
+        // Map machine ID to its config
+        const machines = [];
+        const machineConfigs = [
+            { ids: [1, 6], gram: 125, min: 0.200, max: 0.270 },
+            { ids: [2, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 15, 17, 18, 19, 20], gram: 85, min: 0.240, max: 0.300 },
+            { ids: [10], gram: 22, min: 0.200, max: 0.310 },
+            { ids: [22, 23, 24, 25, 27, 28, 29, 30], gram: 45, min: 0.210, max: 0.310 },
+            { ids: [16, 21, 26], gram: 850, min: 0.200, max: 0.270 }
+        ];
+
+        // Line Mappings
+        const lines = {
+            '1A': [1, 2, 3, 4, 5],
+            '1B': [6, 7, 8, 9, 10],
+            '2A': [11, 12, 13, 14, 15],
+            '2B': [16, 17, 18, 19, 20],
+            '3A': [21, 22, 23, 24, 25],
+            '3B': [26, 27, 28, 29, 30]
+        };
+
+        // Initialize Machine Objects
+        for (let i = 1; i <= 30; i++) {
+            let config = machineConfigs.find(c => c.ids.includes(i));
+            let lineName = Object.keys(lines).find(key => lines[key].includes(i));
+            
+            machines.push({
+                id: i,
+                line: lineName,
+                gram: config.gram,
+                min: config.min,
+                max: config.max
+            });
+        }
+
+        // CSV Data embedded directly to avoid File I/O issues in browser
+        const botCsvData = `Weight,Density
+301,0.179
+302,0.180
+303,0.180
+304,0.181
+305,0.182
+306,0.182
+307,0.183
+308,0.183
+309,0.184
+310,0.185
+311,0.185
+312,0.186
+313,0.186
+314,0.187
+315,0.188
+316,0.188
+317,0.189
+318,0.189
+319,0.190
+320,0.190
+321,0.191
+322,0.192
+323,0.192
+324,0.193
+325,0.193
+326,0.194
+327,0.195
+328,0.195
+329,0.196
+330,0.196
+331,0.197
+332,0.198
+333,0.198
+334,0.199
+335,0.199
+336,0.200
+337,0.201
+338,0.201
+339,0.202
+340,0.202
+341,0.203
+342,0.204
+343,0.204
+344,0.205
+345,0.205
+346,0.206
+347,0.207
+348,0.207
+349,0.208
+350,0.208
+351,0.209
+352,0.210
+353,0.210
+354,0.211
+355,0.211
+356,0.212
+357,0.213
+358,0.213
+359,0.214
+360,0.214
+361,0.215
+362,0.215
+363,0.216
+364,0.217
+365,0.217
+366,0.218
+367,0.218
+368,0.219
+369,0.220
+370,0.220
+371,0.221
+372,0.221
+373,0.222
+374,0.223
+375,0.223
+376,0.224
+377,0.224
+378,0.225
+379,0.226
+380,0.226
+381,0.227
+382,0.227
+383,0.228
+384,0.229
+385,0.229
+386,0.230
+387,0.230
+388,0.231
+389,0.232
+390,0.232
+391,0.233
+392,0.233
+393,0.234
+394,0.235
+395,0.235
+396,0.236
+397,0.236
+398,0.237
+399,0.238
+400,0.238
+401,0.239
+402,0.239
+403,0.240
+404,0.240
+405,0.241
+406,0.242
+407,0.242
+408,0.243
+409,0.243
+410,0.244
+411,0.245
+412,0.245
+413,0.246
+414,0.246
+415,0.247
+416,0.248
+417,0.248
+418,0.249
+419,0.249
+420,0.250
+421,0.251
+422,0.251
+423,0.252
+424,0.252
+425,0.253
+426,0.254
+427,0.254
+428,0.255
+429,0.255
+430,0.256
+431,0.257
+432,0.257
+433,0.258
+434,0.258
+435,0.259
+436,0.260
+437,0.260
+438,0.261
+439,0.261
+440,0.262
+441,0.263
+442,0.263
+443,0.264
+444,0.264
+445,0.265
+446,0.265
+447,0.266
+448,0.267
+449,0.267
+450,0.268
+451,0.268
+452,0.269
+453,0.270
+454,0.270
+455,0.271
+456,0.271
+457,0.272
+458,0.273
+459,0.273
+460,0.274
+461,0.274
+462,0.275
+463,0.276
+464,0.276
+465,0.277
+466,0.277
+467,0.278
+468,0.279
+469,0.279
+470,0.280
+471,0.280
+472,0.281
+473,0.282
+474,0.282
+475,0.283
+476,0.283
+477,0.284
+478,0.285
+479,0.285
+480,0.286
+481,0.286
+482,0.287
+483,0.288
+484,0.288
+485,0.289
+486,0.289
+487,0.290
+488,0.290
+489,0.291
+490,0.292
+491,0.292
+492,0.293
+493,0.293
+494,0.294
+495,0.295
+496,0.295
+497,0.296
+498,0.296
+499,0.297
+500,0.298
+501,0.298
+502,0.299
+503,0.299
+504,0.300
+505,0.301
+506,0.301
+507,0.302
+508,0.302
+509,0.303
+510,0.304
+511,0.304
+512,0.305
+513,0.305
+514,0.306
+515,0.307
+516,0.307
+517,0.308
+518,0.308
+519,0.309
+520,0.310
+521,0.310
+522,0.311
+523,0.311
+524,0.312
+525,0.313
+526,0.313
+527,0.314
+528,0.314
+529,0.315
+530,0.315
+531,0.316
+532,0.317
+533,0.317
+534,0.318
+535,0.318
+536,0.319
+537,0.320
+538,0.320
+539,0.321
+540,0.321
+541,0.322
+542,0.323
+543,0.323
+544,0.324
+545,0.324
+546,0.325
+547,0.326
+548,0.326
+549,0.327
+550,0.327
+551,0.328
+552,0.329
+553,0.329
+554,0.330
+555,0.330
+556,0.331
+557,0.332
+558,0.332
+559,0.333
+560,0.333
+561,0.334
+562,0.335
+563,0.335
+564,0.336
+565,0.336
+566,0.337
+567,0.338
+568,0.338
+569,0.339
+570,0.339
+571,0.340
+572,0.340
+573,0.341
+574,0.342
+575,0.342
+576,0.343
+577,0.343
+578,0.344
+579,0.345
+580,0.345
+581,0.346
+582,0.346
+583,0.347
+584,0.348
+585,0.348
+586,0.349
+587,0.349
+588,0.350`;
+
+        const level9CsvData = `Weight,Density
+301,0.191
+302,0.191
+303,0.192
+304,0.192
+305,0.193
+306,0.194
+307,0.194
+308,0.195
+309,0.196
+310,0.196
+311,0.197
+312,0.197
+313,0.198
+314,0.199
+315,0.199
+316,0.200
+317,0.201
+318,0.201
+319,0.202
+320,0.203
+321,0.203
+322,0.204
+323,0.204
+324,0.205
+325,0.206
+326,0.206
+327,0.207
+328,0.208
+329,0.208
+330,0.209
+331,0.209
+332,0.210
+333,0.211
+334,0.211
+335,0.212
+336,0.213
+337,0.214
+338,0.214
+339,0.215
+340,0.215
+341,0.216
+342,0.216
+343,0.217
+344,0.218
+345,0.218
+346,0.219
+347,0.220
+348,0.220
+349,0.221
+350,0.222
+351,0.222
+352,0.223
+353,0.223
+354,0.224
+355,0.225
+356,0.225
+357,0.226
+358,0.227
+359,0.227
+360,0.228
+361,0.228
+362,0.229
+363,0.230
+364,0.230
+365,0.231
+366,0.232
+367,0.232
+368,0.233
+369,0.234
+370,0.234
+371,0.235
+372,0.235
+373,0.236
+374,0.237
+375,0.237
+376,0.238
+377,0.239
+378,0.239
+379,0.240
+380,0.241
+381,0.241
+382,0.242
+383,0.242
+384,0.243
+385,0.244
+386,0.244
+387,0.245
+388,0.246
+389,0.246
+390,0.247
+391,0.247
+392,0.248
+393,0.249
+394,0.249
+395,0.250
+396,0.251
+397,0.251
+398,0.252
+399,0.253
+400,0.253
+401,0.254
+402,0.254
+403,0.255
+404,0.256
+405,0.256
+406,0.257
+407,0.258
+408,0.258
+409,0.259
+410,0.259
+411,0.260
+412,0.261
+413,0.261
+414,0.262
+415,0.263
+416,0.263
+417,0.264
+418,0.265
+419,0.265
+420,0.266
+421,0.266
+422,0.267
+423,0.268
+424,0.268
+425,0.269
+426,0.270
+427,0.270
+428,0.271
+429,0.272
+430,0.272
+431,0.273
+432,0.273
+433,0.274
+434,0.275
+435,0.275
+436,0.276
+437,0.277
+438,0.278
+439,0.278
+440,0.278
+441,0.279
+442,0.280
+443,0.280
+444,0.281
+445,0.282
+446,0.282
+447,0.283
+448,0.284
+449,0.284
+450,0.285
+451,0.285
+452,0.286
+453,0.287
+454,0.287
+455,0.288
+456,0.289
+457,0.289
+458,0.290
+459,0.291
+460,0.291
+461,0.292
+462,0.292
+463,0.293
+464,0.294
+465,0.294
+466,0.295
+467,0.296
+468,0.296
+469,0.297
+470,0.297
+471,0.298
+472,0.299
+473,0.299
+474,0.300
+475,0.301
+476,0.301
+477,0.302
+478,0.303
+479,0.303
+480,0.304
+481,0.304
+482,0.305
+483,0.306
+484,0.306
+485,0.307
+486,0.308
+487,0.308
+488,0.309
+489,0.309
+490,0.310
+491,0.311
+492,0.311
+493,0.312
+494,0.313
+495,0.313
+496,0.314
+497,0.315
+498,0.315
+499,0.316
+500,0.316
+501,0.317
+502,0.318
+503,0.318
+504,0.319
+505,0.320
+506,0.320
+507,0.321
+508,0.322
+509,0.322
+510,0.323
+511,0.323
+512,0.324
+513,0.325
+514,0.325
+515,0.326
+516,0.327
+517,0.327
+518,0.328
+519,0.328
+520,0.329
+521,0.330
+522,0.330
+523,0.331
+524,0.332
+525,0.332
+526,0.333
+527,0.334
+528,0.334
+529,0.335
+530,0.335
+531,0.336
+532,0.337
+533,0.337
+534,0.338
+535,0.339
+536,0.339
+537,0.340
+538,0.341
+539,0.341
+540,0.342
+541,0.342
+542,0.343
+543,0.344
+544,0.344
+545,0.345
+546,0.346
+547,0.346
+548,0.347
+549,0.347
+550,0.348
+551,0.349
+552,0.349
+553,0.350
+554,0.351
+555,0.351
+556,0.352
+557,0.353
+558,0.353
+559,0.354
+560,0.354
+561,0.355
+562,0.356
+563,0.356
+564,0.357
+565,0.358
+566,0.358
+567,0.359
+568,0.359
+569,0.360
+570,0.361
+571,0.361
+572,0.362
+573,0.363
+574,0.363
+575,0.364
+576,0.365
+577,0.365
+578,0.366
+579,0.366
+580,0.367
+581,0.368
+582,0.368
+583,0.369
+584,0.370
+585,0.370
+586,0.371
+587,0.372
+588,0.372`;
+
+        /* 
+         * =========================================
+         * APP LOGIC
+         * =========================================
+         */
+
+        // Parse CSV helper function
+        function parseCSV(csvString) {
+            const lines = csvString.trim().split('\n');
+            const data = {}; // Using object for O(1) lookup
+            // Skip header (i=1)
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].split(',');
+                if(parts.length === 2) {
+                    const weight = parts[0].trim();
+                    const density = parseFloat(parts[1].trim());
+                    data[weight] = density;
+                }
+            }
+            return data;
+        }
+
+        const botData = parseCSV(botCsvData);
+        const level9Data = parseCSV(level9CsvData);
+
+        // Elements
+        const modeSelect = document.getElementById('mode-select');
+        const weightInput = document.getElementById('weight-input');
+        const resultsArea = document.getElementById('results-area');
+        const subtitle = document.getElementById('subtitle');
+        const modal = document.getElementById('modal');
+        const yearSpan = document.getElementById('year');
+
+        // Set Current Year
+        yearSpan.textContent = new Date().getFullYear();
+
+        // --- Event Listeners ---
+
+        // Input Click (Clear all)
+        weightInput.addEventListener('click', () => {
+            weightInput.value = '';
+            resultsArea.innerHTML = '<div style="color: #555; font-style: italic;">Enter a weight to see results...</div>';
+            weightInput.focus();
+        });
+
+        // Mode Change
+        modeSelect.addEventListener('change', (e) => {
+            const mode = e.target.value;
+            weightInput.value = '';
+            resultsArea.innerHTML = '<div style="color: #555; font-style: italic;">Enter a weight to see results...</div>';
+            
+            if (mode === 'level9') {
+                subtitle.textContent = "Level 9 Silo Densities";
+            } else {
+                subtitle.textContent = "BOT Densities";
+            }
+        });
+
+        // Input Logic (Typing)
+        weightInput.addEventListener('keyup', (e) => {
+            const weight = e.target.value;
+            const mode = modeSelect.value;
+            
+            if (!weight) {
+                resultsArea.innerHTML = '<div style="color: #555; font-style: italic;">Enter a weight to see results...</div>';
+                return;
+            }
+
+            if (mode === 'level9') {
+                handleLevel9Logic(weight);
+            } else {
+                handleBotLogic(weight);
+            }
+        });
+
+        // Modal Close
+        modal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        // --- Logic Functions ---
+
+        function handleLevel9Logic(weight) {
+            const density = level9Data[weight];
+            
+            if (!density) {
+                resultsArea.innerHTML = '<div style="color: #888;">Weight not found in database.</div>';
+                return;
+            }
+
+            resultsArea.innerHTML = `
+                <div style="margin-bottom: 1.5rem; color: #888;">
+                    Density for <strong>${weight}g</strong> is <strong>${density}</strong>
+                </div>
+                <div class="machines-grid" id="machines-container"></div>
+            `;
+
+            const container = document.getElementById('machines-container');
+            let found = false;
+
+            machines.forEach(machine => {
+                if (density >= machine.min && density <= machine.max) {
+                    found = true;
+                    const btn = document.createElement('button');
+                    btn.className = 'machine-btn';
+                    btn.textContent = `Machine ${machine.id}`;
+                    btn.onclick = (e) => {
+                        e.stopPropagation(); // Prevent input clear if bubbling
+                        showModal(machine);
+                    };
+                    container.appendChild(btn);
+                }
+            });
+
+            if (!found) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--accent-red);">No machines accept this density.</div>';
+            }
+        }
+
+        function handleBotLogic(weight) {
+            const density = botData[weight];
+            
+            if (!density) {
+                resultsArea.innerHTML = '<div style="color: #888;">Weight not found in database.</div>';
+                return;
+            }
+
+            let statusClass = 'status-ok';
+            let statusText = 'DENSITY NORMAL';
+            let color = 'var(--accent-green)';
+
+            if (density < 0.250) {
+                statusClass = 'status-danger';
+                statusText = 'DENSITY TOO LOW';
+                color = 'var(--accent-red)';
+            } else if (density > 0.270) {
+                statusClass = 'status-danger';
+                statusText = 'DENSITY TOO HIGH';
+                color = 'var(--accent-red)';
+            }
+
+            resultsArea.innerHTML = `
+                <div class="bot-display ${statusClass}">
+                    <div class="bot-label">Base Powder Density</div>
+                    <div class="bot-value" style="color: ${color}">${density.toFixed(3)}</div>
+                    <div class="status-msg" style="color: ${color}">${statusText}</div>
+                </div>
+            `;
+        }
+
+        function showModal(machine) {
+            document.getElementById('m-title').textContent = `Machine ${machine.id}`;
+            document.getElementById('m-line').textContent = machine.line;
+            document.getElementById('m-gram').textContent = `${machine.gram}g`;
+            document.getElementById('m-range').textContent = `${machine.min.toFixed(3)} - ${machine.max.toFixed(3)}`;
+            
+            modal.classList.add('active');
+        }
+
+    </script>
+</body>
+</html>
