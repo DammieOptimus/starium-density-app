@@ -114,6 +114,18 @@
             margin-bottom: 4rem;
         }
 
+        /* Level 9 Result Animation */
+        .level9-result {
+            font-size: 1.8rem;
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: sparklePulse 2s infinite ease-in-out;
+        }
+
         /* Grid for Machines */
         .machines-grid {
             display: grid;
@@ -160,6 +172,7 @@
             max-width: 500px;
             animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             border: 3px solid transparent;
+            box-sizing: border-box; /* Important for padding responsiveness */
         }
 
         .bot-value {
@@ -319,18 +332,6 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
         }
 
-        /* --- NEW: Level 9 Result Animation --- */
-        .level9-result {
-            font-size: 1.8rem; /* Bigger text */
-            color: #FFFFFF;    /* Whitest white */
-            text-align: center;
-            margin-bottom: 2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            animation: sparklePulse 2s infinite ease-in-out;
-        }
-
         @keyframes sparklePulse {
             0% {
                 transform: scale(1);
@@ -346,27 +347,37 @@
             }
         }
 
-        /* --- NEW: Mobile Responsiveness Fixes --- */
+        /* --- Media Queries (Responsiveness) --- */
         @media (max-width: 600px) {
-            /* Fix BOT Box overflowing on phones */
+            h1 { font-size: 2rem; }
+            
+            .controls {
+                padding: 1rem;
+                width: 95%;
+            }
+
             .bot-display {
-                padding: 1.5rem; /* Reduce padding */
-                width: 85%;      /* Ensure it fits within screen */
+                padding: 1.5rem; /* Reduced padding */
+                width: 85%;      /* Width fits screen */
             }
 
             .bot-value {
-                font-size: 3rem; /* Smaller font for mobile */
+                font-size: 3rem; /* Smaller font */
             }
 
             .bot-label {
                 font-size: 1rem;
             }
-            
-            /* Adjust Level 9 Text for mobile so it doesn't wrap awkwardly */
+
             .level9-result {
-                font-size: 1.4rem; 
+                font-size: 1.4rem; /* Smaller text for mobile */
+            }
+
+            .footer-content {
+                font-size: 0.8rem;
             }
         }
+
     </style>
 </head>
 <body>
@@ -430,7 +441,7 @@
     <script>
         /* 
          * =========================================
-         * DATA CONSTANTS
+         * DATA CONFIGURATION
          * =========================================
          */
         
@@ -469,611 +480,21 @@
             });
         }
 
-        // CSV Data embedded directly to avoid File I/O issues in browser
-        const botCsvData = `Weight,Density
-301,0.179
-302,0.180
-303,0.180
-304,0.181
-305,0.182
-306,0.182
-307,0.183
-308,0.183
-309,0.184
-310,0.185
-311,0.185
-312,0.186
-313,0.186
-314,0.187
-315,0.188
-316,0.188
-317,0.189
-318,0.189
-319,0.190
-320,0.190
-321,0.191
-322,0.192
-323,0.192
-324,0.193
-325,0.193
-326,0.194
-327,0.195
-328,0.195
-329,0.196
-330,0.196
-331,0.197
-332,0.198
-333,0.198
-334,0.199
-335,0.199
-336,0.200
-337,0.201
-338,0.201
-339,0.202
-340,0.202
-341,0.203
-342,0.204
-343,0.204
-344,0.205
-345,0.205
-346,0.206
-347,0.207
-348,0.207
-349,0.208
-350,0.208
-351,0.209
-352,0.210
-353,0.210
-354,0.211
-355,0.211
-356,0.212
-357,0.213
-358,0.213
-359,0.214
-360,0.214
-361,0.215
-362,0.215
-363,0.216
-364,0.217
-365,0.217
-366,0.218
-367,0.218
-368,0.219
-369,0.220
-370,0.220
-371,0.221
-372,0.221
-373,0.222
-374,0.223
-375,0.223
-376,0.224
-377,0.224
-378,0.225
-379,0.226
-380,0.226
-381,0.227
-382,0.227
-383,0.228
-384,0.229
-385,0.229
-386,0.230
-387,0.230
-388,0.231
-389,0.232
-390,0.232
-391,0.233
-392,0.233
-393,0.234
-394,0.235
-395,0.235
-396,0.236
-397,0.236
-398,0.237
-399,0.238
-400,0.238
-401,0.239
-402,0.239
-403,0.240
-404,0.240
-405,0.241
-406,0.242
-407,0.242
-408,0.243
-409,0.243
-410,0.244
-411,0.245
-412,0.245
-413,0.246
-414,0.246
-415,0.247
-416,0.248
-417,0.248
-418,0.249
-419,0.249
-420,0.250
-421,0.251
-422,0.251
-423,0.252
-424,0.252
-425,0.253
-426,0.254
-427,0.254
-428,0.255
-429,0.255
-430,0.256
-431,0.257
-432,0.257
-433,0.258
-434,0.258
-435,0.259
-436,0.260
-437,0.260
-438,0.261
-439,0.261
-440,0.262
-441,0.263
-442,0.263
-443,0.264
-444,0.264
-445,0.265
-446,0.265
-447,0.266
-448,0.267
-449,0.267
-450,0.268
-451,0.268
-452,0.269
-453,0.270
-454,0.270
-455,0.271
-456,0.271
-457,0.272
-458,0.273
-459,0.273
-460,0.274
-461,0.274
-462,0.275
-463,0.276
-464,0.276
-465,0.277
-466,0.277
-467,0.278
-468,0.279
-469,0.279
-470,0.280
-471,0.280
-472,0.281
-473,0.282
-474,0.282
-475,0.283
-476,0.283
-477,0.284
-478,0.285
-479,0.285
-480,0.286
-481,0.286
-482,0.287
-483,0.288
-484,0.288
-485,0.289
-486,0.289
-487,0.290
-488,0.290
-489,0.291
-490,0.292
-491,0.292
-492,0.293
-493,0.293
-494,0.294
-495,0.295
-496,0.295
-497,0.296
-498,0.296
-499,0.297
-500,0.298
-501,0.298
-502,0.299
-503,0.299
-504,0.300
-505,0.301
-506,0.301
-507,0.302
-508,0.302
-509,0.303
-510,0.304
-511,0.304
-512,0.305
-513,0.305
-514,0.306
-515,0.307
-516,0.307
-517,0.308
-518,0.308
-519,0.309
-520,0.310
-521,0.310
-522,0.311
-523,0.311
-524,0.312
-525,0.313
-526,0.313
-527,0.314
-528,0.314
-529,0.315
-530,0.315
-531,0.316
-532,0.317
-533,0.317
-534,0.318
-535,0.318
-536,0.319
-537,0.320
-538,0.320
-539,0.321
-540,0.321
-541,0.322
-542,0.323
-543,0.323
-544,0.324
-545,0.324
-546,0.325
-547,0.326
-548,0.326
-549,0.327
-550,0.327
-551,0.328
-552,0.329
-553,0.329
-554,0.330
-555,0.330
-556,0.331
-557,0.332
-558,0.332
-559,0.333
-560,0.333
-561,0.334
-562,0.335
-563,0.335
-564,0.336
-565,0.336
-566,0.337
-567,0.338
-568,0.338
-569,0.339
-570,0.339
-571,0.340
-572,0.340
-573,0.341
-574,0.342
-575,0.342
-576,0.343
-577,0.343
-578,0.344
-579,0.345
-580,0.345
-581,0.346
-582,0.346
-583,0.347
-584,0.348
-585,0.348
-586,0.349
-587,0.349
-588,0.350`;
-
-        const level9CsvData = `Weight,Density
-301,0.191
-302,0.191
-303,0.192
-304,0.192
-305,0.193
-306,0.194
-307,0.194
-308,0.195
-309,0.196
-310,0.196
-311,0.197
-312,0.197
-313,0.198
-314,0.199
-315,0.199
-316,0.200
-317,0.201
-318,0.201
-319,0.202
-320,0.203
-321,0.203
-322,0.204
-323,0.204
-324,0.205
-325,0.206
-326,0.206
-327,0.207
-328,0.208
-329,0.208
-330,0.209
-331,0.209
-332,0.210
-333,0.211
-334,0.211
-335,0.212
-336,0.213
-337,0.214
-338,0.214
-339,0.215
-340,0.215
-341,0.216
-342,0.216
-343,0.217
-344,0.218
-345,0.218
-346,0.219
-347,0.220
-348,0.220
-349,0.221
-350,0.222
-351,0.222
-352,0.223
-353,0.223
-354,0.224
-355,0.225
-356,0.225
-357,0.226
-358,0.227
-359,0.227
-360,0.228
-361,0.228
-362,0.229
-363,0.230
-364,0.230
-365,0.231
-366,0.232
-367,0.232
-368,0.233
-369,0.234
-370,0.234
-371,0.235
-372,0.235
-373,0.236
-374,0.237
-375,0.237
-376,0.238
-377,0.239
-378,0.239
-379,0.240
-380,0.241
-381,0.241
-382,0.242
-383,0.242
-384,0.243
-385,0.244
-386,0.244
-387,0.245
-388,0.246
-389,0.246
-390,0.247
-391,0.247
-392,0.248
-393,0.249
-394,0.249
-395,0.250
-396,0.251
-397,0.251
-398,0.252
-399,0.253
-400,0.253
-401,0.254
-402,0.254
-403,0.255
-404,0.256
-405,0.256
-406,0.257
-407,0.258
-408,0.258
-409,0.259
-410,0.259
-411,0.260
-412,0.261
-413,0.261
-414,0.262
-415,0.263
-416,0.263
-417,0.264
-418,0.265
-419,0.265
-420,0.266
-421,0.266
-422,0.267
-423,0.268
-424,0.268
-425,0.269
-426,0.270
-427,0.270
-428,0.271
-429,0.272
-430,0.272
-431,0.273
-432,0.273
-433,0.274
-434,0.275
-435,0.275
-436,0.276
-437,0.277
-438,0.278
-439,0.278
-440,0.278
-441,0.279
-442,0.280
-443,0.280
-444,0.281
-445,0.282
-446,0.282
-447,0.283
-448,0.284
-449,0.284
-450,0.285
-451,0.285
-452,0.286
-453,0.287
-454,0.287
-455,0.288
-456,0.289
-457,0.289
-458,0.290
-459,0.291
-460,0.291
-461,0.292
-462,0.292
-463,0.293
-464,0.294
-465,0.294
-466,0.295
-467,0.296
-468,0.296
-469,0.297
-470,0.297
-471,0.298
-472,0.299
-473,0.299
-474,0.300
-475,0.301
-476,0.301
-477,0.302
-478,0.303
-479,0.303
-480,0.304
-481,0.304
-482,0.305
-483,0.306
-484,0.306
-485,0.307
-486,0.308
-487,0.308
-488,0.309
-489,0.309
-490,0.310
-491,0.311
-492,0.311
-493,0.312
-494,0.313
-495,0.313
-496,0.314
-497,0.315
-498,0.315
-499,0.316
-500,0.316
-501,0.317
-502,0.318
-503,0.318
-504,0.319
-505,0.320
-506,0.320
-507,0.321
-508,0.322
-509,0.322
-510,0.323
-511,0.323
-512,0.324
-513,0.325
-514,0.325
-515,0.326
-516,0.327
-517,0.327
-518,0.328
-519,0.328
-520,0.329
-521,0.330
-522,0.330
-523,0.331
-524,0.332
-525,0.332
-526,0.333
-527,0.334
-528,0.334
-529,0.335
-530,0.335
-531,0.336
-532,0.337
-533,0.337
-534,0.338
-535,0.339
-536,0.339
-537,0.340
-538,0.341
-539,0.341
-540,0.342
-541,0.342
-542,0.343
-543,0.344
-544,0.344
-545,0.345
-546,0.346
-547,0.346
-548,0.347
-549,0.347
-550,0.348
-551,0.349
-552,0.349
-553,0.350
-554,0.351
-555,0.351
-556,0.352
-557,0.353
-558,0.353
-559,0.354
-560,0.354
-561,0.355
-562,0.356
-563,0.356
-564,0.357
-565,0.358
-566,0.358
-567,0.359
-568,0.359
-569,0.360
-570,0.361
-571,0.361
-572,0.362
-573,0.363
-574,0.363
-575,0.364
-576,0.365
-577,0.365
-578,0.366
-579,0.366
-580,0.367
-581,0.368
-582,0.368
-583,0.369
-584,0.370
-585,0.370
-586,0.371
-587,0.372
-588,0.372`;
+        /* 
+         * =========================================
+         * CONSTANTS & VOLUMES
+         * =========================================
+         */
+        const LEVEL_9_VOLUME = 1580; // ml
+        const BOT_VOLUME = 1680;     // ml
+        const BOT_MIN_SAFE = 0.200;
+        const BOT_MAX_SAFE = 0.240;
 
         /* 
          * =========================================
          * APP LOGIC
          * =========================================
          */
-
-        // Parse CSV helper function
-        function parseCSV(csvString) {
-            const lines = csvString.trim().split('\n');
-            const data = {}; // Using object for O(1) lookup
-            // Skip header (i=1)
-            for (let i = 1; i < lines.length; i++) {
-                const parts = lines[i].split(',');
-                if(parts.length === 2) {
-                    const weight = parts[0].trim();
-                    const density = parseFloat(parts[1].trim());
-                    data[weight] = density;
-                }
-            }
-            return data;
-        }
-
-        const botData = parseCSV(botCsvData);
-        const level9Data = parseCSV(level9CsvData);
 
         // Elements
         const modeSelect = document.getElementById('mode-select');
@@ -1110,10 +531,10 @@
 
         // Input Logic (Typing)
         weightInput.addEventListener('keyup', (e) => {
-            const weight = e.target.value;
+            const weight = parseFloat(e.target.value);
             const mode = modeSelect.value;
             
-            if (!weight) {
+            if (!weight || isNaN(weight)) {
                 resultsArea.innerHTML = '<div style="color: #555; font-style: italic;">Enter a weight to see results...</div>';
                 return;
             }
@@ -1133,17 +554,14 @@
         // --- Logic Functions ---
 
         function handleLevel9Logic(weight) {
-            const density = level9Data[weight];
+            // Formula: Mass / Volume (1580)
+            // Fixed to 3 decimal places and converted back to number for comparison
+            const density = parseFloat((weight / LEVEL_9_VOLUME).toFixed(3));
             
-            if (!density) {
-                resultsArea.innerHTML = '<div style="color: #888;">Weight not found in database.</div>';
-                return;
-            }
-
-            // UPDATED: Now uses the animating class 'level9-result'
+            // New Sparkling Text Display
             resultsArea.innerHTML = `
                 <div class="level9-result">
-                    Density for ${weight}g is ${density}
+                    Density for ${weight}g is ${density.toFixed(3)}
                 </div>
                 <div class="machines-grid" id="machines-container"></div>
             `;
@@ -1152,6 +570,7 @@
             let found = false;
 
             machines.forEach(machine => {
+                // Check if calculated density falls within machine range
                 if (density >= machine.min && density <= machine.max) {
                     found = true;
                     const btn = document.createElement('button');
@@ -1166,27 +585,24 @@
             });
 
             if (!found) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--accent-red);">No machines accept this density.</div>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--accent-red); font-size: 1.2rem;">No machines accept this density.</div>';
             }
         }
 
         function handleBotLogic(weight) {
-            const density = botData[weight];
+            // Formula: Mass / Volume (1680)
+            const density = parseFloat((weight / BOT_VOLUME).toFixed(3));
             
-            if (!density) {
-                resultsArea.innerHTML = '<div style="color: #888;">Weight not found in database.</div>';
-                return;
-            }
-
             let statusClass = 'status-ok';
             let statusText = 'DENSITY NORMAL';
             let color = 'var(--accent-green)';
 
-            if (density < 0.200) {
+            // Updated Thresholds: Low < 0.200, High > 0.240
+            if (density < BOT_MIN_SAFE) {
                 statusClass = 'status-danger';
                 statusText = 'DENSITY TOO LOW';
                 color = 'var(--accent-red)';
-            } else if (density > 0.240) {
+            } else if (density > BOT_MAX_SAFE) {
                 statusClass = 'status-danger';
                 statusText = 'DENSITY TOO HIGH';
                 color = 'var(--accent-red)';
