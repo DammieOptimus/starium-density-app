@@ -319,6 +319,54 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
         }
 
+        /* --- NEW: Level 9 Result Animation --- */
+        .level9-result {
+            font-size: 1.8rem; /* Bigger text */
+            color: #FFFFFF;    /* Whitest white */
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: sparklePulse 2s infinite ease-in-out;
+        }
+
+        @keyframes sparklePulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+            }
+            50% {
+                transform: scale(1.05); /* Grow slightly */
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 35px var(--accent-blue); /* Glowing sparkle */
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        /* --- NEW: Mobile Responsiveness Fixes --- */
+        @media (max-width: 600px) {
+            /* Fix BOT Box overflowing on phones */
+            .bot-display {
+                padding: 1.5rem; /* Reduce padding */
+                width: 85%;      /* Ensure it fits within screen */
+            }
+
+            .bot-value {
+                font-size: 3rem; /* Smaller font for mobile */
+            }
+
+            .bot-label {
+                font-size: 1rem;
+            }
+            
+            /* Adjust Level 9 Text for mobile so it doesn't wrap awkwardly */
+            .level9-result {
+                font-size: 1.4rem; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -1092,9 +1140,10 @@
                 return;
             }
 
+            // UPDATED: Now uses the animating class 'level9-result'
             resultsArea.innerHTML = `
-                <div style="margin-bottom: 1.5rem; color: #888;">
-                    Density for <strong>${weight}g</strong> is <strong>${density}</strong>
+                <div class="level9-result">
+                    Density for ${weight}g is ${density}
                 </div>
                 <div class="machines-grid" id="machines-container"></div>
             `;
