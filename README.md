@@ -13,7 +13,7 @@ A specialized utility application built for the Quality Control (QC) team at Sta
 - **Quality Assurance:** Instantly validates if powder coming from the tower meets the required specifications.
 - **Visual Alerts:**
   - 🟢 **Green:** Density OK.
-  - 🔴 **Pulsing Red:** Density Too Low (< 0.250) or Too High (> 0.270).
+  - 🔴 **Pulsing Red:** Density Too Low (< 0.200) or Too High (> 0.240).
 
 ### 3. User Experience (UX)
 - **Single-File Architecture:** The entire app lives in one `index.html` file. No servers, installations, or internet connection required.
