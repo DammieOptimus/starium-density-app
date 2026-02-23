@@ -197,24 +197,32 @@
             background: linear-gradient(145deg, #2d2d2d, #3d3d3d);
         }
 
-        .error-message {
-            background-color: #FF1744;
-            color: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            margin-top: 20px;
-            animation: pulse 1s ease-in-out infinite;
+        .machine-btn.highlighted {
+            background: linear-gradient(145deg, #00E676, #00C853);
+            border-color: #00E676;
+            box-shadow: 0 0 25px rgba(0, 230, 118, 0.7);
+            color: #121212;
+            animation: glow 1.5s ease-in-out infinite;
         }
 
-        @keyframes pulse {
+        @keyframes glow {
             0%, 100% {
-                opacity: 1;
+                box-shadow: 0 0 25px rgba(0, 230, 118, 0.7);
             }
             50% {
-                opacity: 0.7;
+                box-shadow: 0 0 40px rgba(0, 230, 118, 1);
             }
+        }
+
+        .machine-btn.highlighted:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(145deg, #00FF80, #00E676);
+        }
+
+        .machine-btn.dimmed {
+            opacity: 0.25;
+            border-color: #444;
+            pointer-events: none;
         }
 
         .bot-result {
@@ -257,21 +265,26 @@
         }
 
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
+            position: fixed !important;
+            top: 0px !important;
+            left: 0px !important;
+            right: 0px !important;
+            bottom: 0px !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: rgba(0, 0, 0, 0.85) !important;
+            z-index: 99999 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
         .modal-overlay.active {
-            display: flex;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         .modal {
@@ -321,6 +334,25 @@
         .modal-close:hover {
             background-color: #00E676;
             transform: scale(1.05);
+        }
+
+        .error-message {
+            background: linear-gradient(145deg, #FF1744, #D50000);
+            color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(255, 23, 68, 0.4);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         footer {
@@ -375,45 +407,15 @@
             opacity: 1;
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.3rem;
-            }
-
-            .control-box {
-                padding: 20px;
-            }
-
-            .density-value {
-                font-size: 3rem;
-            }
-
+        @media (max-width: 400px) {
             .machine-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 5px;
             }
 
             .machine-btn {
-                padding: 12px 5px;
-                font-size: 0.9rem;
-            }
-
-            .bot-result {
-                padding: 25px;
-            }
-
-            .bot-result .density-value {
-                font-size: 2.5rem;
-            }
-
-            .modal {
-                padding: 25px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .machine-grid {
-                grid-template-columns: repeat(2, 1fr);
+                padding: 8px 2px;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -467,7 +469,7 @@
             { id: 5, gram: 85, min: 0.240, max: 0.300 },
             { id: 6, gram: 125, min: 0.200, max: 0.270 },
             { id: 7, gram: 85, min: 0.240, max: 0.300 },
-            { id: 8, gram: 85, min: 0.240, max: 0.300 },
+            { id: 8, gram: 850, min: 0.200, max: 0.270 },
             { id: 9, gram: 85, min: 0.240, max: 0.300 },
             { id: 10, gram: 22, min: 0.200, max: 0.310 },
             { id: 11, gram: 85, min: 0.240, max: 0.300 },
@@ -507,6 +509,19 @@
         const modal = document.getElementById('modal');
         const modalClose = document.getElementById('modal-close');
 
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.85)';
+        modal.style.zIndex = '99999';
+        modal.style.display = 'none';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+
         weightInput.addEventListener('focus', () => {
             weightInput.value = '';
             resultsDiv.innerHTML = '';
@@ -520,12 +535,20 @@
         weightInput.addEventListener('input', calculate);
 
         modalClose.addEventListener('click', () => {
-            modal.classList.remove('active');
+            modal.style.opacity = '0';
+            modal.style.visibility = 'hidden';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
         });
 
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.classList.remove('active');
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
             }
         });
 
@@ -550,27 +573,33 @@
             const matchingMachines = machineData.filter(m => 
                 density >= m.min && density <= m.max
             );
+            const matchingIds = matchingMachines.map(m => m.id);
 
             let html = `
                 <div class="density-display">
                     <div class="density-value">${density}</div>
                     <div class="density-label">g/mL</div>
                 </div>
+                <div class="machine-grid" style="grid-template-columns: repeat(6, 1fr);">
             `;
 
-            if (matchingMachines.length > 0) {
-                html += '<div class="machine-grid">';
-                matchingMachines.forEach(m => {
-                    html += `<button class="machine-btn" data-id="${m.id}">M${m.id}</button>`;
-                });
-                html += '</div>';
-            } else {
+            const columnOrder = [26,21,16,11,6,1, 27,22,17,12,7,2, 28,23,18,13,8,3, 29,24,19,14,9,4, 30,25,20,15,10,5];
+            
+            columnOrder.forEach(id => {
+                const isMatch = matchingIds.includes(id);
+                const btnClass = isMatch ? 'machine-btn highlighted' : 'machine-btn dimmed';
+                html += `<button class="${btnClass}" data-id="${id}">M${id}</button>`;
+            });
+            
+            html += '</div>';
+
+            if (matchingMachines.length === 0) {
                 html += '<div class="error-message">No matching machines found for this density!</div>';
             }
 
             resultsDiv.innerHTML = html;
 
-            document.querySelectorAll('.machine-btn').forEach(btn => {
+            document.querySelectorAll('.machine-btn.highlighted').forEach(btn => {
                 btn.addEventListener('click', () => showMachineModal(parseInt(btn.dataset.id), density));
             });
         }
@@ -609,7 +638,19 @@
             document.getElementById('modal-gram').textContent = `${machine.gram}g`;
             document.getElementById('modal-range').textContent = `${machine.min.toFixed(3)} - ${machine.max.toFixed(3)}`;
 
-            modal.classList.add('active');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.85)';
+            modal.style.zIndex = '99999';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.display = 'flex';
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
         }
     </script>
 </body>
