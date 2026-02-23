@@ -129,8 +129,10 @@
         /* Grid for Machines */
         .machines-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(6, 80px);
+            grid-template-rows: repeat(5, auto);
+            justify-content: center;
+            gap: 1.5rem;
             width: 100%;
             animation: fadeInUp 0.5s ease-out;
         }
@@ -148,6 +150,10 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .machine-btn:hover {
@@ -159,6 +165,23 @@
 
         .machine-btn:active {
             transform: scale(0.95);
+        }
+
+        .machine-btn.highlighted {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green), 0 0 40px var(--accent-green);
+            animation: pulseGreen 1.5s infinite;
+        }
+
+        .machine-btn.dimmed {
+            opacity: 0.25;
+        }
+
+        @keyframes pulseGreen {
+            0% { box-shadow: 0 0 10px var(--accent-green); }
+            50% { box-shadow: 0 0 25px var(--accent-green), 0 0 40px var(--accent-green); }
+            100% { box-shadow: 0 0 10px var(--accent-green); }
         }
 
         /* BOT Density Display */
@@ -376,6 +399,24 @@
             .footer-content {
                 font-size: 0.8rem;
             }
+
+            .machines-grid {
+                grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(5, auto);
+                gap: 0.5rem;
+            }
+
+            .machine-btn {
+                padding: 0.75rem 0.25rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .machine-btn {
+                padding: 0.5rem 0.15rem;
+                font-size: 0.7rem;
+            }
         }
 
     </style>
@@ -450,10 +491,10 @@
         const machines = [];
         const machineConfigs = [
             { ids: [1, 6], gram: 125, min: 0.200, max: 0.270 },
-            { ids: [2, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 15, 17, 18, 19, 20], gram: 85, min: 0.240, max: 0.300 },
+            { ids: [2, 3, 4, 5, 7, 9, 11, 12, 13, 14, 15, 17, 18, 19, 20], gram: 85, min: 0.240, max: 0.300 },
             { ids: [10], gram: 22, min: 0.200, max: 0.310 },
             { ids: [22, 23, 24, 25, 27, 28, 29, 30], gram: 45, min: 0.210, max: 0.310 },
-            { ids: [16, 21, 26], gram: 850, min: 0.200, max: 0.270 }
+            { ids: [8, 16, 21, 26], gram: 850, min: 0.200, max: 0.270 }
         ];
 
         // Line Mappings
@@ -567,26 +608,29 @@
             `;
 
             const container = document.getElementById('machines-container');
-            let found = false;
 
+            // Add machines with explicit grid column positioning
+            // Rightmost column (6): 1-5, column 5: 6-10, etc.
             machines.forEach(machine => {
-                // Check if calculated density falls within machine range
-                if (density >= machine.min && density <= machine.max) {
-                    found = true;
-                    const btn = document.createElement('button');
-                    btn.className = 'machine-btn';
-                    btn.textContent = `Machine ${machine.id}`;
-                    btn.onclick = (e) => {
-                        e.stopPropagation(); // Prevent input clear if bubbling
-                        showModal(machine);
-                    };
-                    container.appendChild(btn);
-                }
+                const isMatch = density >= machine.min && density <= machine.max;
+                
+                const btn = document.createElement('button');
+                btn.className = 'machine-btn' + (isMatch ? ' highlighted' : ' dimmed');
+                btn.textContent = `Machine ${machine.id}`;
+                
+                // Calculate column: 1-5 in col 6, 6-10 in col 5, ..., 26-30 in col 1
+                const col = 6 - Math.floor((machine.id - 1) / 5);
+                // Calculate row: 1,6,11,16,21,26 in row 1; 2,7,12,17,22,27 in row 2, etc.
+                const row = ((machine.id - 1) % 5) + 1;
+                btn.style.gridColumn = col;
+                btn.style.gridRow = row;
+                
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    showModal(machine);
+                };
+                container.appendChild(btn);
             });
-
-            if (!found) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--accent-red); font-size: 1.2rem;">No machines accept this density.</div>';
-            }
         }
 
         function handleBotLogic(weight) {
