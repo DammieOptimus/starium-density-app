@@ -252,6 +252,19 @@
             box-shadow: 0 0 30px rgba(0, 230, 118, 0.5);
         }
 
+        .bot-result .bot-label {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
         .bot-result .density-value {
             color: #121212;
             text-shadow: none;
@@ -451,6 +464,7 @@
                 <p>Line: <span id="modal-line"></span></p>
                 <p>Gram Setting: <span id="modal-gram"></span></p>
                 <p>Density Range: <span id="modal-range"></span></p>
+                <p>Carton Content: <span id="modal-carton"></span></p>
             </div>
             <button class="modal-close" id="modal-close">Close</button>
         </div>
@@ -502,6 +516,17 @@
             21: '3A', 22: '3A', 23: '3A', 24: '3A', 25: '3A',
             26: '3B', 27: '3B', 28: '3B', 29: '3B', 30: '3B'
         };
+
+        function getCartonContent(gram) {
+            switch(gram) {
+                case 22: return '162 pieces (27 strings × 6 pcs)';
+                case 45: return '84 pieces (14 strings × 6 pcs)';
+                case 85: return '52 pieces (8 strings × 6 pcs + 4 pcs)';
+                case 125: return '31 pieces (7 strings × 4 pcs + 3 pcs)';
+                case 850: return '7 pieces of detergents';
+                default: return 'N/A';
+            }
+        }
 
         const modeSelect = document.getElementById('mode');
         const weightInput = document.getElementById('weight');
@@ -621,6 +646,7 @@
 
             const html = `
                 <div class="bot-result ${statusClass}">
+                    <div class="bot-label">Base Powder Density</div>
                     <div class="density-value">${density} <span style="font-size: 1.5rem;">g/mL</span></div>
                     <div class="status-text">${statusText}</div>
                 </div>
@@ -637,6 +663,7 @@
             document.getElementById('modal-line').textContent = line;
             document.getElementById('modal-gram').textContent = `${machine.gram}g`;
             document.getElementById('modal-range').textContent = `${machine.min.toFixed(3)} - ${machine.max.toFixed(3)}`;
+            document.getElementById('modal-carton').textContent = getCartonContent(machine.gram);
 
             modal.style.position = 'fixed';
             modal.style.top = '0';
