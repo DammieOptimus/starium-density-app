@@ -464,6 +464,10 @@
                 <span class="modal-label">Allowed Range:</span>
                 <span class="modal-value" id="m-range">0.200 - 0.270</span>
             </div>
+            <div class="modal-info">
+                <span class="modal-label">Carton Content:</span>
+                <span class="modal-value" id="modal-carton"></span>
+            </div>
             <div style="margin-top: 2rem; font-size: 0.8rem; color: #666;">
                 Click outside to close
             </div>
@@ -666,8 +670,20 @@
             document.getElementById('m-line').textContent = machine.line;
             document.getElementById('m-gram').textContent = `${machine.gram}g`;
             document.getElementById('m-range').textContent = `${machine.min.toFixed(3)} - ${machine.max.toFixed(3)}`;
+            document.getElementById('modal-carton').textContent = getCartonContent(machine.gram);
             
             modal.classList.add('active');
+        }
+
+        function getCartonContent(gram) {
+            const cartonMap = {
+                22: '162 pieces (27 strings × 6 pcs)',
+                45: '84 pieces (14 strings × 6 pcs)',
+                85: '52 pieces (8 strings × 6 pcs + 4 pcs)',
+                125: '31 pieces (7 strings × 4 pcs + 3 pcs)',
+                850: '7 pieces of detergents'
+            };
+            return cartonMap[gram] || '';
         }
 
     </script>
