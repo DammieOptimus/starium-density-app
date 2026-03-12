@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +34,7 @@
                 transform: translateY(-100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -76,6 +78,25 @@
             box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
         }
 
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            /* Helps stack them neatly on very small mobile screens */
+        }
+
+        /* Styling for the locked dropdown */
+        .mode-selector select:disabled {
+            background-color: #1a1a1a;
+            color: #888;
+            border-color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            /* Prevents the glow effect on hover */
+        }
+
         main {
             flex: 1;
             padding: 20px;
@@ -97,6 +118,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -156,10 +178,13 @@
         }
 
         @keyframes sparkle {
-            0%, 100% {
+
+            0%,
+            100% {
                 text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
                 transform: scale(1);
             }
+
             50% {
                 text-shadow: 0 0 40px rgba(255, 255, 255, 1), 0 0 60px rgba(0, 188, 212, 0.5);
                 transform: scale(1.02);
@@ -206,9 +231,12 @@
         }
 
         @keyframes glow {
-            0%, 100% {
+
+            0%,
+            100% {
                 box-shadow: 0 0 25px rgba(0, 230, 118, 0.7);
             }
+
             50% {
                 box-shadow: 0 0 40px rgba(0, 230, 118, 1);
             }
@@ -239,9 +267,12 @@
         }
 
         @keyframes alertPulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 box-shadow: 0 0 20px rgba(255, 23, 68, 0.5);
             }
+
             50% {
                 box-shadow: 0 0 40px rgba(255, 23, 68, 0.8);
             }
@@ -363,9 +394,19 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         footer {
@@ -433,15 +474,27 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Starium Rafa Quality Control Tool</h1>
-        <div class="mode-selector">
-            <label for="mode">Mode:</label>
-            <select id="mode">
-                <option value="level9">Level 9 Silo Densities</option>
-                <option value="bot">BOT Densities</option>
-            </select>
+        <div class="header-controls">
+            <div class="mode-selector">
+                <label for="mode">Mode:</label>
+                <select id="mode">
+                    <option value="level9">Level 9 Silo Densities</option>
+                    <option value="bot">BOT Densities</option>
+                </select>
+            </div>
+
+            <div class="mode-selector">
+                <label for="shift">Shift:</label>
+                <!-- The 'disabled' attribute locks it from user interaction -->
+                <select id="shift" disabled>
+                    <option value="DAY">DAY</option>
+                    <option value="NIGHT">NIGHT</option>
+                </select>
+            </div>
         </div>
     </header>
 
@@ -518,7 +571,7 @@
         };
 
         function getCartonContent(gram) {
-            switch(gram) {
+            switch (gram) {
                 case 22: return '162 pieces (27 strings × 6 pcs)';
                 case 45: return '84 pieces (14 strings × 6 pcs)';
                 case 85: return '52 pieces (8 strings × 6 pcs + 4 pcs)';
@@ -529,6 +582,28 @@
         }
 
         const modeSelect = document.getElementById('mode');
+        const shiftSelect = document.getElementById('shift');
+
+        // Function to determine and set the current shift
+        function updateShift() {
+            // getHours() returns 0-23 (military time)
+            const currentHour = new Date().getHours();
+
+            // If time is 7:00 AM (7) or later, AND before 7:00 PM (19)
+            if (currentHour >= 7 && currentHour < 19) {
+                shiftSelect.value = 'DAY';
+            } else {
+                shiftSelect.value = 'NIGHT';
+            }
+        }
+
+        // 1. Run immediately when the page loads
+        updateShift();
+
+        // 2. Bonus: Check the time every 60 seconds (60000ms)
+        // This ensures if a tablet is left open at 6:59 PM, it automatically flips to NIGHT at 7:00 PM
+        setInterval(updateShift, 60000);
+
         const weightInput = document.getElementById('weight');
         const resultsDiv = document.getElementById('results');
         const modal = document.getElementById('modal');
@@ -595,7 +670,7 @@
 
         function calculateLevel9(weight) {
             const density = (weight / 1580).toFixed(3);
-            const matchingMachines = machineData.filter(m => 
+            const matchingMachines = machineData.filter(m =>
                 density >= m.min && density <= m.max
             );
             const matchingIds = matchingMachines.map(m => m.id);
@@ -608,14 +683,14 @@
                 <div class="machine-grid" style="grid-template-columns: repeat(6, 1fr);">
             `;
 
-            const columnOrder = [26,21,16,11,6,1, 27,22,17,12,7,2, 28,23,18,13,8,3, 29,24,19,14,9,4, 30,25,20,15,10,5];
-            
+            const columnOrder = [26, 21, 16, 11, 6, 1, 27, 22, 17, 12, 7, 2, 28, 23, 18, 13, 8, 3, 29, 24, 19, 14, 9, 4, 30, 25, 20, 15, 10, 5];
+
             columnOrder.forEach(id => {
                 const isMatch = matchingIds.includes(id);
                 const btnClass = isMatch ? 'machine-btn highlighted' : 'machine-btn dimmed';
                 html += `<button class="${btnClass}" data-id="${id}">M${id}</button>`;
             });
-            
+
             html += '</div>';
 
             if (matchingMachines.length === 0) {
@@ -681,4 +756,5 @@
         }
     </script>
 </body>
+
 </html>
