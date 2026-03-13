@@ -61,19 +61,34 @@
             font-weight: bold;
         }
 
-        .mode-selector select {
+        .mode-selector select,
+        .mode-selector input[type="text"] {
             background-color: #1E1E1E;
             color: #ffffff;
             border: 2px solid #00BCD4;
             padding: 10px 20px;
             font-size: 1rem;
             border-radius: 5px;
-            cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
         }
 
-        .mode-selector select:hover {
+        .mode-selector select {
+            cursor: pointer;
+        }
+
+        .mode-selector input[type="text"] {
+            cursor: text;
+            width: 140px;
+            /* Keeps the input box from getting too wide */
+        }
+
+        .mode-selector input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        .mode-selector select:hover,
+        .mode-selector input[type="text"]:focus {
             background-color: #2d2d2d;
             box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
         }
@@ -489,11 +504,27 @@
 
             <div class="mode-selector">
                 <label for="shift">Shift:</label>
-                <!-- The 'disabled' attribute locks it from user interaction -->
                 <select id="shift" disabled>
                     <option value="DAY">DAY</option>
                     <option value="NIGHT">NIGHT</option>
                 </select>
+            </div>
+
+            <!-- NEW: Team Selection -->
+            <div class="mode-selector">
+                <label for="team">Team:</label>
+                <select id="team">
+                    <option value="" disabled selected>Select Team</option>
+                    <option value="A">Team A</option>
+                    <option value="B">Team B</option>
+                    <option value="C">Team C</option>
+                </select>
+            </div>
+
+            <!-- NEW: QC Staff Name -->
+            <div class="mode-selector">
+                <label for="qc-name">Name:</label>
+                <input type="text" id="qc-name" placeholder="Enter Name" autocomplete="off">
             </div>
         </div>
     </header>
@@ -603,6 +634,31 @@
         // 2. Bonus: Check the time every 60 seconds (60000ms)
         // This ensures if a tablet is left open at 6:59 PM, it automatically flips to NIGHT at 7:00 PM
         setInterval(updateShift, 60000);
+
+
+        // --- NEW: Local Storage Memory Logic ---
+        const teamSelect = document.getElementById('team');
+        const qcNameInput = document.getElementById('qc-name');
+
+        // 1. Loader: Check if the browser remembers the user from last time
+        const savedTeam = localStorage.getItem('qcTeam');
+        if (savedTeam) {
+            teamSelect.value = savedTeam;
+        }
+
+        const savedName = localStorage.getItem('qcName');
+        if (savedName) {
+            qcNameInput.value = savedName;
+        }
+
+        // 2. Saver: Instantly save the user's choice to memory whenever they change it
+        teamSelect.addEventListener('change', (e) => {
+            localStorage.setItem('qcTeam', e.target.value);
+        });
+
+        qcNameInput.addEventListener('input', (e) => {
+            localStorage.setItem('qcName', e.target.value);
+        });
 
         const weightInput = document.getElementById('weight');
         const resultsDiv = document.getElementById('results');
